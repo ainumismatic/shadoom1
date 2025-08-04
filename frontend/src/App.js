@@ -75,10 +75,95 @@ function App() {
   }, []);
 
   const signInWithGoogle = async () => {
+    setAuthLoading(true);
+    setAuthError('');
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error('Login error:', error);
+      setAuthError('Erro ao fazer login com Google. Tente novamente.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const signUpWithEmail = async (e) => {
+    e.preventDefault();
+    if (!email || !password || !name) {
+      setAuthError('Preencha todos os campos');
+      return;
+    }
+    
+    setAuthLoading(true);
+    setAuthError('');
+    
+    try {
+      // Create user account
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Update profile with name
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+      
+      // Clear form
+      setEmail('');
+      setPassword('');
+      setName('');
+      
+    } catch (error) {
+      console.error('Signup error:', error);
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          setAuthError('Este email já está cadastrado. Tente fazer login.');
+          break;
+        case 'auth/weak-password':
+          setAuthError('A senha deve ter pelo menos 6 caracteres.');
+          break;
+        case 'auth/invalid-email':
+          setAuthError('Email inválido.');
+          break;
+        default:
+          setAuthError('Erro ao criar conta. Tente novamente.');
+      }
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const signInWithEmail = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setAuthError('Preencha email e senha');
+      return;
+    }
+    
+    setAuthLoading(true);
+    setAuthError('');
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      
+      // Clear form
+      setEmail('');
+      setPassword('');
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      switch (error.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          setAuthError('Email ou senha incorretos.');
+          break;
+        case 'auth/too-many-requests':
+          setAuthError('Muitas tentativas. Tente novamente mais tarde.');
+          break;
+        default:
+          setAuthError('Erro ao fazer login. Tente novamente.');
+      }
+    } finally {
+      setAuthLoading(false);
     }
   };
 
