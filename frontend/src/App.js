@@ -842,42 +842,42 @@ function App() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-5xl mx-auto w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             
             {/* Left side - Branding */}
-            <div className="text-center lg:text-left">
-              <div className="mb-8">
+            <div className="text-center lg:text-left order-2 lg:order-1">
+              <div className="mb-6 lg:mb-8">
                 <img 
                   src="https://images.pexels.com/photos/8728386/pexels-photo-8728386.jpeg" 
                   alt="Shadoom AI Technology"
-                  className="w-full h-72 object-cover rounded-2xl shadow-2xl mb-6 opacity-90"
+                  className="w-full h-48 sm:h-64 lg:h-72 object-cover rounded-2xl shadow-2xl mb-4 lg:mb-6 opacity-90"
                 />
               </div>
               
-              <h1 className="text-5xl lg:text-6xl font-bold text-white mb-4">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-3 lg:mb-4">
                 👻 <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Shadoom</span>
               </h1>
-              <p className="text-xl text-purple-200 mb-4">
+              <p className="text-lg sm:text-xl text-purple-200 mb-2 lg:mb-4">
                 Seu Gerenciador Fantasma de Engajamento
               </p>
-              <p className="text-purple-300 max-w-lg mx-auto lg:mx-0 mb-8">
+              <p className="text-sm sm:text-base text-purple-300 max-w-lg mx-auto lg:mx-0 mb-6 lg:mb-8 px-4 lg:px-0">
                 Banco Secreto de Ideas com IA • Análise completa do seu perfil • Nunca mais fique sem conteúdo!
               </p>
               
               {/* Plans Comparison */}
-              <div className="grid grid-cols-2 gap-4 text-center mb-8">
-                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                  <h3 className="text-lg font-bold text-white mb-2">FREE</h3>
-                  <ul className="text-purple-200 text-sm space-y-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4 text-center mb-6 lg:mb-8 px-4 lg:px-0">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-3 lg:p-4 border border-white/20">
+                  <h3 className="text-base lg:text-lg font-bold text-white mb-2">FREE</h3>
+                  <ul className="text-purple-200 text-xs sm:text-sm space-y-1">
                     <li>✅ 10 ideias/mês</li>
                     <li>✅ Roteiros básicos</li>
                     <li>❌ Análise de perfil</li>
                   </ul>
                 </div>
-                <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-xl p-4 border border-purple-400/30">
-                  <h3 className="text-lg font-bold text-white mb-2">PREMIUM</h3>
-                  <ul className="text-purple-200 text-sm space-y-1">
+                <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-xl p-3 lg:p-4 border border-purple-400/30">
+                  <h3 className="text-base lg:text-lg font-bold text-white mb-2">PREMIUM</h3>
+                  <ul className="text-purple-200 text-xs sm:text-sm space-y-1">
                     <li>✅ Ideias ilimitadas</li>
                     <li>✅ Análise IA completa</li>
                     <li>✅ Insights das redes</li>
@@ -887,12 +887,12 @@ function App() {
             </div>
 
             {/* Right side - Auth Form */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-white mb-2">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 lg:p-8 border border-white/20 order-1 lg:order-2">
+              <div className="text-center mb-6 lg:mb-8">
+                <h2 className="text-xl lg:text-2xl font-bold text-white mb-2">
                   {showLogin ? 'Entrar na Shadoom' : 'Criar Conta Grátis'}
                 </h2>
-                <p className="text-purple-200">
+                <p className="text-sm lg:text-base text-purple-200">
                   {showLogin ? 'Bem-vindo de volta!' : 'Comece a gerar ideias agora'}
                 </p>
               </div>
@@ -913,27 +913,27 @@ function App() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Seu nome completo *"
-                      className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                      className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
                       disabled={authLoading}
                       required
                     />
                     
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="space-y-3">
                       <input
                         type="text"
                         value={instagramHandle}
                         onChange={(e) => setInstagramHandle(e.target.value)}
                         placeholder="@instagram (opcional)"
-                        className="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                        className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
                         disabled={authLoading}
                       />
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <input
                           type="text"
                           value={tiktokHandle}
                           onChange={(e) => setTiktokHandle(e.target.value)}
                           placeholder="@tiktok"
-                          className="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                          className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
                           disabled={authLoading}
                         />
                         <input
@@ -941,7 +941,7 @@ function App() {
                           value={kwaiHandle}
                           onChange={(e) => setKwaiHandle(e.target.value)}
                           placeholder="@kwai"
-                          className="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                          className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
                           disabled={authLoading}
                         />
                       </div>
@@ -954,7 +954,7 @@ function App() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Seu email *"
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
                   disabled={authLoading}
                   required
                 />
@@ -964,7 +964,7 @@ function App() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Sua senha *"
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
                   disabled={authLoading}
                   required
                 />
@@ -972,7 +972,7 @@ function App() {
                 <button
                   type="submit"
                   disabled={authLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 text-base min-h-[44px]"
                 >
                   {authLoading ? '⏳ Carregando...' : showLogin ? '🚀 Entrar' : '✨ Criar Conta'}
                 </button>
@@ -992,7 +992,7 @@ function App() {
               <button
                 onClick={signInWithGoogle}
                 disabled={authLoading}
-                className="w-full bg-white text-gray-800 py-3 px-4 rounded-lg font-bold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mb-6"
+                className="w-full bg-white text-gray-800 py-3 px-4 rounded-lg font-bold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mb-6 min-h-[44px] text-base"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -1016,7 +1016,7 @@ function App() {
                     setTiktokHandle('');
                     setKwaiHandle('');
                   }}
-                  className="text-purple-300 hover:text-white transition-colors"
+                  className="text-purple-300 hover:text-white transition-colors text-sm"
                 >
                   {showLogin ? 'Não tem conta? Criar agora' : 'Já tem conta? Entrar'}
                 </button>
