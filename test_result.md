@@ -307,3 +307,5 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "Comprehensive backend testing completed successfully. All 7 backend API endpoints tested and working correctly. Gemini AI integration functional with proper fallback mechanism. MongoDB integration confirmed. No critical issues found. Backend is production-ready."
+  - agent: "testing"
+    message: "CRITICAL FRONTEND ISSUES IDENTIFIED: 1) Email/password signup fails with 422 backend error preventing user redirection to main page - this is the main reported bug. 2) Google login fails due to unauthorized domain in Firebase console. 3) Backend API works correctly when tested directly, suggesting data format mismatch between Firebase and backend. 4) UI and responsiveness work perfectly. 5) Main features (ideas generation, history) cannot be tested due to authentication blocking access. PRIORITY: Fix authentication flow to enable full app functionality."
