@@ -822,7 +822,13 @@ function App() {
   };
 
   if (showAdminPanel) {
-    return <AdminPanel onBack={() => setShowAdminPanel(false)} />;
+    return <AdminPanel onBack={() => {
+      setShowAdminPanel(false);
+      // Remove admin parameter from URL
+      const url = new URL(window.location);
+      url.searchParams.delete('admin');
+      window.history.replaceState({}, document.title, url.pathname);
+    }} />;
   }
 
   if (loading) {
