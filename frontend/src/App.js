@@ -89,10 +89,29 @@ function App() {
     setAuthLoading(true);
     setAuthError('');
     try {
+      // Add additional domain configuration
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error('Login error:', error);
-      setAuthError('Erro ao fazer login com Google. Tente novamente.');
+      console.error('Error code:', error.code); // Debug log
+      
+      switch (error.code) {
+        case 'auth/unauthorized-domain':
+          setAuthError('Domínio não autorizado. Configure o Firebase para este domínio.');
+          break;
+        case 'auth/popup-closed-by-user':
+          setAuthError('Login cancelado pelo usuário.');
+          break;
+        case 'auth/popup-blocked':
+          setAuthError('Popup bloqueado. Permita popups para este site.');
+          break;
+        default:
+          setAuthError('Erro ao fazer login com Google. Tente novamente.');
+      }
     } finally {
       setAuthLoading(false);
     }
