@@ -421,123 +421,125 @@ const PremiumModal = ({ user, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-gradient-to-br from-purple-900/90 to-pink-900/90 backdrop-blur-lg rounded-2xl p-8 border border-white/20 max-w-2xl w-full">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            ✨ Upgrade para Premium
-          </h2>
-          <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg rounded-xl p-6 border border-yellow-500/30 mb-6">
-            <div className="text-4xl mb-2">🚀</div>
-            <h3 className="text-2xl font-bold text-white mb-2">R$ 29,90/mês</h3>
-            <ul className="text-left text-white space-y-2">
-              <li>✅ <strong>Ideias ilimitadas</strong> com IA</li>
-              <li>✅ <strong>Análise completa</strong> do seu perfil</li>
-              <li>✅ <strong>Insights das redes sociais</strong></li>
-              <li>✅ <strong>Horários otimizados</strong> para posts</li>
-              <li>✅ <strong>Suporte prioritário</strong></li>
-            </ul>
+      <div className="bg-gradient-to-br from-purple-900/90 to-pink-900/90 backdrop-blur-lg rounded-2xl border border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 lg:p-8">
+          <div className="text-center mb-6 lg:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              ✨ Upgrade para Premium
+            </h2>
+            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg rounded-xl p-4 sm:p-6 border border-yellow-500/30 mb-4 lg:mb-6">
+              <div className="text-3xl lg:text-4xl mb-2">🚀</div>
+              <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">R$ 29,90/mês</h3>
+              <ul className="text-left text-white space-y-1 sm:space-y-2 text-sm sm:text-base">
+                <li>✅ <strong>Ideias ilimitadas</strong> com IA</li>
+                <li>✅ <strong>Análise completa</strong> do seu perfil</li>
+                <li>✅ <strong>Insights das redes sociais</strong></li>
+                <li>✅ <strong>Horários otimizados</strong> para posts</li>
+                <li>✅ <strong>Suporte prioritário</strong></li>
+              </ul>
+            </div>
           </div>
-        </div>
 
-        {/* Payment Method Selection */}
-        <div className="mb-6">
-          <h3 className="text-lg font-bold text-white mb-4">Método de Pagamento:</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={() => setPaymentMethod('card')}
-              className={`p-4 rounded-lg border transition-all ${paymentMethod === 'card' ? 'border-purple-400 bg-purple-600/20' : 'border-white/20 bg-white/5'}`}
-            >
-              <div className="text-2xl mb-2">💳</div>
-              <div className="text-white font-bold">Cartão de Crédito</div>
-            </button>
-            
-            <button
-              onClick={() => setPaymentMethod('crypto')}
-              className={`p-4 rounded-lg border transition-all ${paymentMethod === 'crypto' ? 'border-orange-400 bg-orange-600/20' : 'border-white/20 bg-white/5'}`}
-            >
-              <div className="text-2xl mb-2">₿</div>
-              <div className="text-white font-bold">Criptomoedas</div>
-            </button>
+          {/* Payment Method Selection */}
+          <div className="mb-4 lg:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-3 lg:mb-4">Método de Pagamento:</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+              <button
+                onClick={() => setPaymentMethod('card')}
+                className={`p-3 lg:p-4 rounded-lg border transition-all min-h-[60px] ${paymentMethod === 'card' ? 'border-purple-400 bg-purple-600/20' : 'border-white/20 bg-white/5'}`}
+              >
+                <div className="text-xl lg:text-2xl mb-2">💳</div>
+                <div className="text-white font-bold text-sm sm:text-base">Cartão de Crédito</div>
+              </button>
+              
+              <button
+                onClick={() => setPaymentMethod('crypto')}
+                className={`p-3 lg:p-4 rounded-lg border transition-all min-h-[60px] ${paymentMethod === 'crypto' ? 'border-orange-400 bg-orange-600/20' : 'border-white/20 bg-white/5'}`}
+              >
+                <div className="text-xl lg:text-2xl mb-2">₿</div>
+                <div className="text-white font-bold text-sm sm:text-base">Criptomoedas</div>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Payment Forms */}
-        {paymentMethod === 'card' && (
-          <div className="space-y-4 mb-6">
-            <input
-              type="text"
-              placeholder="Nome no Cartão"
-              value={cardData.name}
-              onChange={(e) => setCardData({...cardData, name: e.target.value})}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            />
-            <input
-              type="text"
-              placeholder="Número do Cartão"
-              value={cardData.card_number}
-              onChange={(e) => setCardData({...cardData, card_number: e.target.value})}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            />
-            <div className="grid grid-cols-2 gap-4">
+          {/* Payment Forms */}
+          {paymentMethod === 'card' && (
+            <div className="space-y-3 lg:space-y-4 mb-4 lg:mb-6">
               <input
                 type="text"
-                placeholder="MM/AA"
-                value={cardData.expiry}
-                onChange={(e) => setCardData({...cardData, expiry: e.target.value})}
-                className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                placeholder="Nome no Cartão"
+                value={cardData.name}
+                onChange={(e) => setCardData({...cardData, name: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
               />
               <input
                 type="text"
-                placeholder="CVV"
-                value={cardData.cvv}
-                onChange={(e) => setCardData({...cardData, cvv: e.target.value})}
-                className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                placeholder="Número do Cartão"
+                value={cardData.card_number}
+                onChange={(e) => setCardData({...cardData, card_number: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
               />
+              <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                <input
+                  type="text"
+                  placeholder="MM/AA"
+                  value={cardData.expiry}
+                  onChange={(e) => setCardData({...cardData, expiry: e.target.value})}
+                  className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
+                />
+                <input
+                  type="text"
+                  placeholder="CVV"
+                  value={cardData.cvv}
+                  onChange={(e) => setCardData({...cardData, cvv: e.target.value})}
+                  className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {paymentMethod === 'crypto' && (
-          <div className="space-y-4 mb-6">
-            <select
-              value={cryptoData.type}
-              onChange={(e) => setCryptoData({...cryptoData, type: e.target.value})}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-orange-400"
+          {paymentMethod === 'crypto' && (
+            <div className="space-y-3 lg:space-y-4 mb-4 lg:mb-6">
+              <select
+                value={cryptoData.type}
+                onChange={(e) => setCryptoData({...cryptoData, type: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-orange-400 text-base"
+              >
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+                <option value="usdt">Tether (USDT)</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Seu endereço da carteira"
+                value={cryptoData.address}
+                onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-base"
+              />
+              <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg p-3 lg:p-4">
+                <p className="text-orange-200 text-xs sm:text-sm">
+                  💡 <strong>Instruções:</strong> Após confirmar, você receberá o endereço para envio da criptomoeda. O upgrade será ativado automaticamente após confirmação da transação.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
+            <button
+              onClick={onClose}
+              className="flex-1 bg-white/10 text-white py-3 px-4 rounded-lg font-bold hover:bg-white/20 transition-colors min-h-[44px] text-base"
             >
-              <option value="bitcoin">Bitcoin (BTC)</option>
-              <option value="ethereum">Ethereum (ETH)</option>
-              <option value="usdt">Tether (USDT)</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Seu endereço da carteira"
-              value={cryptoData.address}
-              onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            />
-            <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg p-4">
-              <p className="text-orange-200 text-sm">
-                💡 <strong>Instruções:</strong> Após confirmar, você receberá o endereço para envio da criptomoeda. O upgrade será ativado automaticamente após confirmação da transação.
-              </p>
-            </div>
+              Cancelar
+            </button>
+            <button
+              onClick={handlePurchase}
+              disabled={processing}
+              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300 min-h-[44px] text-base"
+            >
+              {processing ? '⏳ Processando...' : `💳 Pagar R$ 29,90`}
+            </button>
           </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex space-x-4">
-          <button
-            onClick={onClose}
-            className="flex-1 bg-white/10 text-white py-3 rounded-lg font-bold hover:bg-white/20 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handlePurchase}
-            disabled={processing}
-            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
-          >
-            {processing ? '⏳ Processando...' : `💳 Pagar R$ 29,90`}
-          </button>
         </div>
       </div>
     </div>
