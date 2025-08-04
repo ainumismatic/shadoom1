@@ -38,12 +38,18 @@ function App() {
   const [ideas, setIdeas] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showProfileAnalysis, setShowProfileAnalysis] = useState(false);
+  const [profileAnalysis, setProfileAnalysis] = useState(null);
+  const [analyzingProfile, setAnalyzingProfile] = useState(false);
   
   // Auth form states
   const [showLogin, setShowLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [instagramHandle, setInstagramHandle] = useState('');
+  const [tiktokHandle, setTiktokHandle] = useState('');
+  const [kwaiHandle, setKwaiHandle] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
 
@@ -55,7 +61,10 @@ function App() {
           const userData = {
             email: firebaseUser.email,
             name: firebaseUser.displayName || firebaseUser.email.split('@')[0] || 'Usuário',
-            profile_pic: firebaseUser.photoURL || null
+            profile_pic: firebaseUser.photoURL || null,
+            instagram_handle: instagramHandle || null,
+            tiktok_handle: tiktokHandle || null,
+            kwai_handle: kwaiHandle || null
           };
           
           console.log('Creating user with data:', userData); // Debug log
@@ -83,7 +92,7 @@ function App() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [instagramHandle, tiktokHandle, kwaiHandle]);
 
   const signInWithGoogle = async () => {
     setAuthLoading(true);
@@ -120,7 +129,7 @@ function App() {
   const signUpWithEmail = async (e) => {
     e.preventDefault();
     if (!email || !password || !name) {
-      setAuthError('Preencha todos os campos');
+      setAuthError('Preencha todos os campos obrigatórios');
       return;
     }
     
@@ -140,6 +149,9 @@ function App() {
       setEmail('');
       setPassword('');
       setName('');
+      setInstagramHandle('');
+      setTiktokHandle('');
+      setKwaiHandle('');
       
     } catch (error) {
       console.error('Signup error:', error);
@@ -228,11 +240,61 @@ function App() {
       setIdeas(prevIdeas => [...newIdeas, ...prevIdeas]);
       setTopic('');
       
+      // Update user data to reflect new ideas count
+      const userResponse = await axios.get(`${API}/users/${user.email}`);
+      setUser(userResponse.data);
+      
     } catch (error) {
       console.error('Error generating ideas:', error);
-      alert('Erro ao gerar ideias. Tente novamente!');
+      if (error.response?.status === 403) {
+        alert('Limite de ideias atingido! Faça upgrade para Premium para ideias ilimitadas.');
+      } else {
+        alert('Erro ao gerar ideias. Tente novamente!');
+      }
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const analyzeProfile = async (platform, handle) => {
+    if (!user || !handle.trim()) return;
+    
+    setAnalyzingProfile(true);
+    try {
+      const response = await axios.post(`${API}/analyze-profile`, {
+        user_id: user.id,
+        platform: platform,
+        handle: handle.trim()
+      });
+      
+      setProfileAnalysis(response.data);
+    } catch (error) {
+      console.error('Error analyzing profile:', error);
+      if (error.response?.status === 403) {
+        alert('Análise de perfil disponível apenas para usuários Premium!');
+      } else {
+        alert('Erro ao analisar perfil. Tente novamente!');
+      }
+    } finally {
+      setAnalyzingProfile(false);
+    }
+  };
+
+  const upgradeToPremium = async () => {
+    try {
+      await axios.post(`${API}/upgrade-plan`, {
+        user_id: user.id,
+        plan: "premium"
+      });
+      
+      // Update user data
+      const userResponse = await axios.get(`${API}/users/${user.email}`);
+      setUser(userResponse.data);
+      
+      alert('Upgrade para Premium realizado com sucesso! 🎉');
+    } catch (error) {
+      console.error('Error upgrading plan:', error);
+      alert('Erro ao fazer upgrade. Tente novamente!');
     }
   };
 
@@ -281,22 +343,26 @@ function App() {
                 Seu Gerenciador Fantasma de Engajamento
               </p>
               <p className="text-purple-300 max-w-lg mx-auto lg:mx-0 mb-8">
-                Banco Secreto de Ideas com IA • Nunca mais fique sem conteúdo para postar!
+                Banco Secreto de Ideas com IA • Análise completa do seu perfil • Nunca mais fique sem conteúdo!
               </p>
               
-              {/* Features */}
-              <div className="grid grid-cols-3 gap-4 text-center">
+              {/* Plans Comparison */}
+              <div className="grid grid-cols-2 gap-4 text-center mb-8">
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                  <div className="text-2xl mb-2">🤖</div>
-                  <p className="text-purple-200 text-sm">IA Criativa</p>
+                  <h3 className="text-lg font-bold text-white mb-2">FREE</h3>
+                  <ul className="text-purple-200 text-sm space-y-1">
+                    <li>✅ 10 ideias/mês</li>
+                    <li>✅ Roteiros básicos</li>
+                    <li>❌ Análise de perfil</li>
+                  </ul>
                 </div>
-                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                  <div className="text-2xl mb-2">📱</div>
-                  <p className="text-purple-200 text-sm">Multi-Formato</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-                  <div className="text-2xl mb-2">🎯</div>
-                  <p className="text-purple-200 text-sm">Hashtags IA</p>
+                <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-xl p-4 border border-purple-400/30">
+                  <h3 className="text-lg font-bold text-white mb-2">PREMIUM</h3>
+                  <ul className="text-purple-200 text-sm space-y-1">
+                    <li>✅ Ideias ilimitadas</li>
+                    <li>✅ Análise IA completa</li>
+                    <li>✅ Insights das redes</li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -322,32 +388,66 @@ function App() {
               {/* Email/Password Form */}
               <form onSubmit={showLogin ? signInWithEmail : signUpWithEmail} className="space-y-4 mb-6">
                 {!showLogin && (
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Seu nome completo"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                    disabled={authLoading}
-                  />
+                  <>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Seu nome completo *"
+                      className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                      disabled={authLoading}
+                      required
+                    />
+                    
+                    <div className="grid grid-cols-1 gap-3">
+                      <input
+                        type="text"
+                        value={instagramHandle}
+                        onChange={(e) => setInstagramHandle(e.target.value)}
+                        placeholder="@instagram (opcional)"
+                        className="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                        disabled={authLoading}
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={tiktokHandle}
+                          onChange={(e) => setTiktokHandle(e.target.value)}
+                          placeholder="@tiktok"
+                          className="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                          disabled={authLoading}
+                        />
+                        <input
+                          type="text"
+                          value={kwaiHandle}
+                          onChange={(e) => setKwaiHandle(e.target.value)}
+                          placeholder="@kwai"
+                          className="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                          disabled={authLoading}
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
                 
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu email"
+                  placeholder="Seu email *"
                   className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
                   disabled={authLoading}
+                  required
                 />
                 
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Sua senha"
+                  placeholder="Sua senha *"
                   className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
                   disabled={authLoading}
+                  required
                 />
                 
                 <button
@@ -393,6 +493,9 @@ function App() {
                     setEmail('');
                     setPassword('');
                     setName('');
+                    setInstagramHandle('');
+                    setTiktokHandle('');
+                    setKwaiHandle('');
                   }}
                   className="text-purple-300 hover:text-white transition-colors"
                 >
@@ -414,23 +517,62 @@ function App() {
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-white">👻 Shadoom</h1>
             <span className="text-purple-200">|</span>
-            <span className="text-purple-200">Banco de Ideas IA</span>
+            <span className="text-purple-200">
+              {user.plan === 'premium' ? '✨ Premium' : '🆓 Free'} 
+              {user.plan === 'free' && ` (${user.ideas_generated || 0}/10 ideias)`}
+            </span>
           </div>
           
           <div className="flex items-center space-x-4">
+            {user.plan === 'free' && (
+              <button
+                onClick={upgradeToPremium}
+                className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 transition-all duration-300 text-sm"
+              >
+                ⭐ Upgrade Premium
+              </button>
+            )}
+            
             <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="bg-purple-600/50 text-white px-4 py-2 rounded-lg hover:bg-purple-600/70 transition-colors"
+              onClick={() => {
+                setShowHistory(false);
+                setShowProfileAnalysis(false);
+              }}
+              className={`px-4 py-2 rounded-lg transition-colors ${!showHistory && !showProfileAnalysis ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
             >
-              {showHistory ? '✨ Gerar Novo' : '📚 Histórico'}
+              ✨ Gerar Ideas
             </button>
             
+            <button
+              onClick={() => {
+                setShowHistory(true);
+                setShowProfileAnalysis(false);
+              }}
+              className={`px-4 py-2 rounded-lg transition-colors ${showHistory ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
+            >
+              📚 Histórico
+            </button>
+            
+            {user.plan === 'premium' && (
+              <button
+                onClick={() => {
+                  setShowProfileAnalysis(true);
+                  setShowHistory(false);
+                }}
+                className={`px-4 py-2 rounded-lg transition-colors ${showProfileAnalysis ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
+              >
+                🔍 Análise Premium
+              </button>
+            )}
+            
             <div className="flex items-center space-x-2">
-              <img
-                src={user.profile_pic}
-                alt={user.name}
-                className="w-8 h-8 rounded-full"
-              />
+              {user.profile_pic && (
+                <img
+                  src={user.profile_pic}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full"
+                />
+              )}
               <span className="text-white text-sm">{user.name}</span>
             </div>
             
@@ -445,15 +587,116 @@ function App() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        {!showHistory ? (
+        {showProfileAnalysis && user.plan === 'premium' ? (
+          /* Profile Analysis Section */
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              🔍 Análise Premium de Perfil
+            </h2>
+            <p className="text-purple-200 mb-8">
+              Análise completa das suas redes sociais com insights da IA
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
+              {user.instagram_handle && (
+                <button
+                  onClick={() => analyzeProfile('instagram', user.instagram_handle)}
+                  disabled={analyzingProfile}
+                  className="bg-gradient-to-r from-pink-600 to-purple-600 text-white py-3 px-4 rounded-lg font-bold hover:from-pink-700 hover:to-purple-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+                >
+                  📷 Analisar Instagram
+                </button>
+              )}
+              {user.tiktok_handle && (
+                <button
+                  onClick={() => analyzeProfile('tiktok', user.tiktok_handle)}
+                  disabled={analyzingProfile}
+                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-4 rounded-lg font-bold hover:from-red-700 hover:to-pink-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+                >
+                  🎵 Analisar TikTok
+                </button>
+              )}
+              {user.kwai_handle && (
+                <button
+                  onClick={() => analyzeProfile('kwai', user.kwai_handle)}
+                  disabled={analyzingProfile}
+                  className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-4 rounded-lg font-bold hover:from-orange-700 hover:to-red-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+                >
+                  ⚡ Analisar Kwai
+                </button>
+              )}
+            </div>
+
+            {analyzingProfile && (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">🤖</div>
+                <p className="text-purple-200">Analisando seu perfil com IA...</p>
+              </div>
+            )}
+
+            {profileAnalysis && (
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 max-w-4xl mx-auto">
+                <h3 className="text-2xl font-bold text-white mb-6">
+                  Análise: @{profileAnalysis.handle} ({profileAnalysis.platform})
+                </h3>
+                
+                <div className="grid md:grid-cols-2 gap-8 text-left">
+                  <div>
+                    <h4 className="text-lg font-bold text-purple-200 mb-3">📊 Análise Geral</h4>
+                    <p className="text-purple-100 mb-6">{profileAnalysis.analysis}</p>
+                    
+                    <h4 className="text-lg font-bold text-purple-200 mb-3">⏰ Melhores Horários</h4>
+                    <div className="flex space-x-2 mb-6">
+                      {profileAnalysis.best_posting_times.map((time, index) => (
+                        <span key={index} className="bg-purple-600/30 text-purple-200 px-3 py-1 rounded-full text-sm">
+                          {time}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-bold text-purple-200 mb-3">💡 Recomendações</h4>
+                    <ul className="space-y-2 mb-6">
+                      {profileAnalysis.recommendations.map((rec, index) => (
+                        <li key={index} className="text-purple-100 text-sm flex items-start">
+                          <span className="text-purple-400 mr-2">•</span>
+                          {rec}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="border-t border-white/20 pt-6 mt-6">
+                  <div className="grid md:grid-cols-2 gap-8 text-left">
+                    <div>
+                      <h4 className="text-lg font-bold text-purple-200 mb-3">👥 Insights da Audiência</h4>
+                      <p className="text-purple-100 text-sm">{profileAnalysis.audience_insights}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-bold text-purple-200 mb-3">📈 Performance</h4>
+                      <p className="text-purple-100 text-sm">{profileAnalysis.content_performance}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : !showHistory ? (
           /* Generate Ideas Section */
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">
               🧠 Banco Secreto de Ideas
             </h2>
-            <p className="text-purple-200 mb-8">
-              Digite qualquer tópico e receba 5 ideias criativas instantaneamente!
+            <p className="text-purple-200 mb-2">
+              Digite qualquer tópico e receba ideias criativas instantaneamente!
             </p>
+            {user.plan === 'free' && (
+              <p className="text-yellow-300 text-sm mb-8">
+                Plano Free: {user.ideas_generated || 0}/10 ideias usadas este mês
+              </p>
+            )}
 
             <div className="max-w-2xl mx-auto mb-8">
               <div className="flex space-x-4">
@@ -461,18 +704,24 @@ function App() {
                   type="text"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  placeholder="Ex: ansiedade, fitness, moda, negócios..."
+                  placeholder="Ex: ansiedade, fitness, moda, negócios, culinária..."
                   className="flex-1 px-6 py-4 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
                   onKeyPress={(e) => e.key === 'Enter' && generateIdeas()}
                 />
                 <button
                   onClick={generateIdeas}
-                  disabled={generating || !topic.trim()}
+                  disabled={generating || !topic.trim() || (user.plan === 'free' && user.ideas_generated >= 10)}
                   className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300"
                 >
                   {generating ? '🤖 Gerando...' : '✨ Gerar Ideas'}
                 </button>
               </div>
+              
+              {user.plan === 'free' && user.ideas_generated >= 10 && (
+                <p className="text-yellow-200 text-sm mt-4">
+                  Limite atingido! Faça upgrade para Premium para ideias ilimitadas 🚀
+                </p>
+              )}
             </div>
           </div>
         ) : (
@@ -488,7 +737,7 @@ function App() {
         )}
 
         {/* Ideas Grid */}
-        {ideas.length > 0 && (
+        {ideas.length > 0 && (showHistory || (!showHistory && !showProfileAnalysis)) && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ideas.map((idea, index) => (
               <div
@@ -585,7 +834,7 @@ function App() {
             👻 Shadoom - Seu assistente invisível para engajamento máximo
           </p>
           <p className="text-purple-300 text-sm mt-2">
-            Banco de Ideas • Versão Beta • Powered by Gemini AI
+            {user.plan === 'premium' ? 'Premium' : 'Free'} • Powered by Gemini AI • Análise completa de perfil
           </p>
         </div>
       </footer>
