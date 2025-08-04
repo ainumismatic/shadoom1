@@ -1032,75 +1032,80 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
       {/* Header */}
       <header className="bg-white/10 backdrop-blur-lg border-b border-white/20">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-white">👻 Shadoom</h1>
-            <span className="text-purple-200">|</span>
-            <span className="text-purple-200">
-              {user.plan === 'premium' ? '✨ Premium' : '🆓 Free'} 
-              {user.plan === 'free' && ` (${user.ideas_generated || 0}/10 ideias)`}
-            </span>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            {user.plan === 'free' && (
-              <button
-                onClick={() => setShowPremiumModal(true)}
-                className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 transition-all duration-300 text-sm"
-              >
-                ⭐ Upgrade Premium
-              </button>
-            )}
-            
-            <button
-              onClick={() => {
-                setShowHistory(false);
-                setShowProfileAnalysis(false);
-              }}
-              className={`px-4 py-2 rounded-lg transition-colors ${!showHistory && !showProfileAnalysis ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
-            >
-              ✨ Gerar Ideas
-            </button>
-            
-            <button
-              onClick={() => {
-                setShowHistory(true);
-                setShowProfileAnalysis(false);
-              }}
-              className={`px-4 py-2 rounded-lg transition-colors ${showHistory ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
-            >
-              📚 Histórico
-            </button>
-            
-            {user.plan === 'premium' && (
-              <button
-                onClick={() => {
-                  setShowProfileAnalysis(true);
-                  setShowHistory(false);
-                }}
-                className={`px-4 py-2 rounded-lg transition-colors ${showProfileAnalysis ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
-              >
-                🔍 Análise Premium
-              </button>
-            )}
-            
-            <div className="flex items-center space-x-2">
-              {user.profile_pic && (
-                <img
-                  src={user.profile_pic}
-                  alt={user.name}
-                  className="w-8 h-8 rounded-full"
-                />
-              )}
-              <span className="text-white text-sm">{user.name}</span>
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          {/* Mobile layout */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-white">👻 Shadoom</h1>
+              <span className="text-purple-200 hidden sm:inline">|</span>
+              <span className="text-purple-200 text-sm sm:text-base">
+                {user.plan === 'premium' ? '✨ Premium' : '🆓 Free'} 
+                {user.plan === 'free' && ` (${user.ideas_generated || 0}/10)`}
+              </span>
             </div>
             
-            <button
-              onClick={handleSignOut}
-              className="text-purple-200 hover:text-white transition-colors"
-            >
-              Sair
-            </button>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              {user.plan === 'free' && (
+                <button
+                  onClick={() => setShowPremiumModal(true)}
+                  className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-2 rounded-lg font-bold hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 transition-all duration-300 text-xs sm:text-sm min-h-[40px]"
+                >
+                  ⭐ Premium
+                </button>
+              )}
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setShowHistory(false);
+                    setShowProfileAnalysis(false);
+                  }}
+                  className={`px-3 py-2 rounded-lg transition-colors text-xs sm:text-sm min-h-[40px] ${!showHistory && !showProfileAnalysis ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
+                >
+                  ✨ Ideas
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowHistory(true);
+                    setShowProfileAnalysis(false);
+                  }}
+                  className={`px-3 py-2 rounded-lg transition-colors text-xs sm:text-sm min-h-[40px] ${showHistory ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
+                >
+                  📚 Histórico
+                </button>
+                
+                {user.plan === 'premium' && (
+                  <button
+                    onClick={() => {
+                      setShowProfileAnalysis(true);
+                      setShowHistory(false);
+                    }}
+                    className={`px-3 py-2 rounded-lg transition-colors text-xs sm:text-sm min-h-[40px] ${showProfileAnalysis ? 'bg-purple-600 text-white' : 'bg-purple-600/50 text-white hover:bg-purple-600/70'}`}
+                  >
+                    🔍 Análise
+                  </button>
+                )}
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                {user.profile_pic && (
+                  <img
+                    src={user.profile_pic}
+                    alt={user.name}
+                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
+                  />
+                )}
+                <span className="text-white text-xs sm:text-sm max-w-[100px] sm:max-w-none truncate">{user.name}</span>
+              </div>
+              
+              <button
+                onClick={handleSignOut}
+                className="text-purple-200 hover:text-white transition-colors text-xs sm:text-sm"
+              >
+                Sair
+              </button>
+            </div>
           </div>
         </div>
       </header>
