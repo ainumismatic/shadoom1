@@ -52,17 +52,28 @@ function App() {
       if (firebaseUser) {
         try {
           // Create or get user in our database
-          const response = await axios.post(`${API}/users`, {
+          const userData = {
             email: firebaseUser.email,
-            name: firebaseUser.displayName,
-            profile_pic: firebaseUser.photoURL
-          });
+            name: firebaseUser.displayName || firebaseUser.email.split('@')[0] || 'Usuário',
+            profile_pic: firebaseUser.photoURL || null
+          };
+          
+          console.log('Creating user with data:', userData); // Debug log
+          
+          const response = await axios.post(`${API}/users`, userData);
           setUser(response.data);
           
           // Load user's ideas history
           loadUserIdeas(response.data.id);
         } catch (error) {
           console.error('Error creating user:', error);
+          console.error('Error details:', error.response?.data); // Debug log
+          
+          // Clear Firebase auth if backend fails
+          if (error.response?.status === 422) {
+            setAuthError('Erro ao criar perfil. Tente novamente.');
+            await signOut(auth);
+          }
         }
       } else {
         setUser(null);
