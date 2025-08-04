@@ -38,6 +38,14 @@ function App() {
   const [ideas, setIdeas] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  
+  // Auth form states
+  const [showLogin, setShowLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
