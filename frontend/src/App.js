@@ -1110,69 +1110,69 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-6 lg:py-8">
         {showProfileAnalysis && user.plan === 'premium' ? (
           /* Profile Analysis Section */
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">
+          <div className="text-center mb-8 lg:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
               🔍 Análise Premium de Perfil
             </h2>
-            <p className="text-purple-200 mb-8">
+            <p className="text-sm sm:text-base text-purple-200 mb-6 lg:mb-8 px-4 lg:px-0">
               Análise completa das suas redes sociais com insights da IA
             </p>
 
-            <div className="grid md:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 mb-6 lg:mb-8 max-w-2xl mx-auto">
               {user.instagram_handle && (
                 <button
                   onClick={() => analyzeProfile('instagram', user.instagram_handle)}
                   disabled={analyzingProfile}
-                  className="bg-gradient-to-r from-pink-600 to-purple-600 text-white py-3 px-4 rounded-lg font-bold hover:from-pink-700 hover:to-purple-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+                  className="bg-gradient-to-r from-pink-600 to-purple-600 text-white py-3 px-4 rounded-lg font-bold hover:from-pink-700 hover:to-purple-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300 text-sm min-h-[44px]"
                 >
-                  📷 Analisar Instagram
+                  📷 Instagram
                 </button>
               )}
               {user.tiktok_handle && (
                 <button
                   onClick={() => analyzeProfile('tiktok', user.tiktok_handle)}
                   disabled={analyzingProfile}
-                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-4 rounded-lg font-bold hover:from-red-700 hover:to-pink-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-4 rounded-lg font-bold hover:from-red-700 hover:to-pink-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300 text-sm min-h-[44px]"
                 >
-                  🎵 Analisar TikTok
+                  🎵 TikTok
                 </button>
               )}
               {user.kwai_handle && (
                 <button
                   onClick={() => analyzeProfile('kwai', user.kwai_handle)}
                   disabled={analyzingProfile}
-                  className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-4 rounded-lg font-bold hover:from-orange-700 hover:to-red-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+                  className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-4 rounded-lg font-bold hover:from-orange-700 hover:to-red-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300 text-sm min-h-[44px]"
                 >
-                  ⚡ Analisar Kwai
+                  ⚡ Kwai
                 </button>
               )}
             </div>
 
             {analyzingProfile && (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-4">🤖</div>
-                <p className="text-purple-200">Analisando seu perfil com IA...</p>
+              <div className="text-center py-6 lg:py-8">
+                <div className="text-3xl lg:text-4xl mb-4">🤖</div>
+                <p className="text-purple-200 text-sm lg:text-base">Analisando seu perfil com IA...</p>
               </div>
             )}
 
             {profileAnalysis && (
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 max-w-4xl mx-auto">
-                <h3 className="text-2xl font-bold text-white mb-6">
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/20 max-w-4xl mx-auto">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6">
                   Análise: @{profileAnalysis.handle} ({profileAnalysis.platform})
                 </h3>
                 
-                <div className="grid md:grid-cols-2 gap-8 text-left">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 text-left">
                   <div>
-                    <h4 className="text-lg font-bold text-purple-200 mb-3">📊 Análise Geral</h4>
-                    <p className="text-purple-100 mb-6">{profileAnalysis.analysis}</p>
+                    <h4 className="text-base lg:text-lg font-bold text-purple-200 mb-3">📊 Análise Geral</h4>
+                    <p className="text-purple-100 mb-4 lg:mb-6 text-sm lg:text-base">{profileAnalysis.analysis}</p>
                     
-                    <h4 className="text-lg font-bold text-purple-200 mb-3">⏰ Melhores Horários</h4>
-                    <div className="flex space-x-2 mb-6">
+                    <h4 className="text-base lg:text-lg font-bold text-purple-200 mb-3">⏰ Melhores Horários</h4>
+                    <div className="flex flex-wrap gap-2 mb-4 lg:mb-6">
                       {profileAnalysis.best_posting_times.map((time, index) => (
-                        <span key={index} className="bg-purple-600/30 text-purple-200 px-3 py-1 rounded-full text-sm">
+                        <span key={index} className="bg-purple-600/30 text-purple-200 px-3 py-1 rounded-full text-xs lg:text-sm">
                           {time}
                         </span>
                       ))}
@@ -1180,10 +1180,10 @@ function App() {
                   </div>
                   
                   <div>
-                    <h4 className="text-lg font-bold text-purple-200 mb-3">💡 Recomendações</h4>
-                    <ul className="space-y-2 mb-6">
+                    <h4 className="text-base lg:text-lg font-bold text-purple-200 mb-3">💡 Recomendações</h4>
+                    <ul className="space-y-2 mb-4 lg:mb-6">
                       {profileAnalysis.recommendations.map((rec, index) => (
-                        <li key={index} className="text-purple-100 text-sm flex items-start">
+                        <li key={index} className="text-purple-100 text-xs lg:text-sm flex items-start">
                           <span className="text-purple-400 mr-2">•</span>
                           {rec}
                         </li>
@@ -1192,15 +1192,15 @@ function App() {
                   </div>
                 </div>
                 
-                <div className="border-t border-white/20 pt-6 mt-6">
-                  <div className="grid md:grid-cols-2 gap-8 text-left">
+                <div className="border-t border-white/20 pt-4 lg:pt-6 mt-4 lg:mt-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 text-left">
                     <div>
-                      <h4 className="text-lg font-bold text-purple-200 mb-3">👥 Insights da Audiência</h4>
-                      <p className="text-purple-100 text-sm">{profileAnalysis.audience_insights}</p>
+                      <h4 className="text-base lg:text-lg font-bold text-purple-200 mb-3">👥 Insights da Audiência</h4>
+                      <p className="text-purple-100 text-xs lg:text-sm">{profileAnalysis.audience_insights}</p>
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold text-purple-200 mb-3">📈 Performance</h4>
-                      <p className="text-purple-100 text-sm">{profileAnalysis.content_performance}</p>
+                      <h4 className="text-base lg:text-lg font-bold text-purple-200 mb-3">📈 Performance</h4>
+                      <p className="text-purple-100 text-xs lg:text-sm">{profileAnalysis.content_performance}</p>
                     </div>
                   </div>
                 </div>
@@ -1209,40 +1209,40 @@ function App() {
           </div>
         ) : !showHistory ? (
           /* Generate Ideas Section */
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">
+          <div className="text-center mb-8 lg:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
               🧠 Banco Secreto de Ideas
             </h2>
-            <p className="text-purple-200 mb-2">
+            <p className="text-sm sm:text-base text-purple-200 mb-2 px-4 lg:px-0">
               Digite qualquer tópico e receba ideias criativas instantaneamente!
             </p>
             {user.plan === 'free' && (
-              <p className="text-yellow-300 text-sm mb-8">
+              <p className="text-yellow-300 text-xs sm:text-sm mb-6 lg:mb-8">
                 Plano Free: {user.ideas_generated || 0}/10 ideias usadas este mês
               </p>
             )}
 
-            <div className="max-w-2xl mx-auto mb-8">
-              <div className="flex space-x-4">
+            <div className="max-w-2xl mx-auto mb-6 lg:mb-8">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <input
                   type="text"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  placeholder="Ex: ansiedade, fitness, moda, negócios, culinária..."
-                  className="flex-1 px-6 py-4 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  placeholder="Ex: ansiedade, fitness, moda, negócios..."
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-full bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
                   onKeyPress={(e) => e.key === 'Enter' && generateIdeas()}
                 />
                 <button
                   onClick={generateIdeas}
                   disabled={generating || !topic.trim() || (user.plan === 'free' && user.ideas_generated >= 10)}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-full font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 min-h-[44px] text-sm sm:text-base"
                 >
                   {generating ? '🤖 Gerando...' : '✨ Gerar Ideas'}
                 </button>
               </div>
               
               {user.plan === 'free' && user.ideas_generated >= 10 && (
-                <p className="text-yellow-200 text-sm mt-4">
+                <p className="text-yellow-200 text-xs sm:text-sm mt-4">
                   Limite atingido! Faça upgrade para Premium para ideias ilimitadas 🚀
                 </p>
               )}
@@ -1250,11 +1250,11 @@ function App() {
           </div>
         ) : (
           /* Ideas History Header */
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">
+          <div className="text-center mb-8 lg:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
               📚 Suas Ideas Salvas
             </h2>
-            <p className="text-purple-200">
+            <p className="text-sm sm:text-base text-purple-200 px-4 lg:px-0">
               {ideas.length} ideias criativas no seu arsenal
             </p>
           </div>
@@ -1262,13 +1262,13 @@ function App() {
 
         {/* Ideas Grid */}
         {ideas.length > 0 && (showHistory || (!showHistory && !showProfileAnalysis)) && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
             {ideas.map((idea, index) => (
               <div
                 key={idea.id}
-                className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105"
+                className="bg-white/10 backdrop-blur-lg rounded-xl p-4 lg:p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105"
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-3 lg:mb-4">
                   <div className="flex items-center space-x-2">
                     <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
                       {idea.content_type}
@@ -1279,18 +1279,18 @@ function App() {
                   </div>
                   <button
                     onClick={() => deleteIdea(idea.id)}
-                    className="text-red-400 hover:text-red-300 text-sm"
+                    className="text-red-400 hover:text-red-300 text-sm min-w-[24px] min-h-[24px]"
                   >
                     🗑️
                   </button>
                 </div>
                 
-                <h3 className="text-white font-bold text-lg mb-3 leading-tight">
+                <h3 className="text-white font-bold text-sm sm:text-base lg:text-lg mb-3 leading-tight">
                   {idea.title}
                 </h3>
                 
                 <div className="bg-black/20 rounded-lg p-3 mb-4">
-                  <p className="text-purple-100 text-sm whitespace-pre-line">
+                  <p className="text-purple-100 text-xs sm:text-sm whitespace-pre-line">
                     {idea.script}
                   </p>
                 </div>
@@ -1306,22 +1306,22 @@ function App() {
                   ))}
                 </div>
                 
-                <div className="flex space-x-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => copyToClipboard(idea.title)}
-                    className="flex-1 bg-purple-600/50 text-white text-xs py-2 px-3 rounded-lg hover:bg-purple-600/70 transition-colors"
+                    className="bg-purple-600/50 text-white text-xs py-2 px-2 rounded-lg hover:bg-purple-600/70 transition-colors min-h-[36px]"
                   >
                     📋 Título
                   </button>
                   <button
                     onClick={() => copyToClipboard(idea.script)}
-                    className="flex-1 bg-purple-600/50 text-white text-xs py-2 px-3 rounded-lg hover:bg-purple-600/70 transition-colors"
+                    className="bg-purple-600/50 text-white text-xs py-2 px-2 rounded-lg hover:bg-purple-600/70 transition-colors min-h-[36px]"
                   >
                     📝 Roteiro
                   </button>
                   <button
                     onClick={() => copyToClipboard(idea.hashtags.join(' '))}
-                    className="flex-1 bg-purple-600/50 text-white text-xs py-2 px-3 rounded-lg hover:bg-purple-600/70 transition-colors"
+                    className="bg-purple-600/50 text-white text-xs py-2 px-2 rounded-lg hover:bg-purple-600/70 transition-colors min-h-[36px]"
                   >
                     🏷️ Tags
                   </button>
