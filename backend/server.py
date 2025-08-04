@@ -489,7 +489,7 @@ async def generate_content_ideas(request: ContentIdeaCreate):
                         "title": f"🎯 {request.topic} em 60 segundos - MÉTODO TESTADO!",
                         "script": f"1. 'Você tem 1 minuto? Vou te ensinar {request.topic}'\n2. Passo 1: O básico essencial\n3. Passo 2: O segredo que acelera\n4. 'Funcionou? Conta aqui embaixo!'",
                         "content_type": "Reels",
-                        "hashtags": [f"#{request.topic.lower().replace(' '', '')}", "#1minuto", "#metodo", "#rapido", "#testado", "#funciona"]
+                        "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#1minuto", "#metodo", "#rapido", "#testado", "#funciona"]
                     },
                     {
                         "title": f"💡 5 erros em {request.topic} que te impedem de ter resultado!",
