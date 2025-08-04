@@ -606,6 +606,13 @@ function App() {
       setLoading(false);
     });
 
+    // Check for admin access via URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const adminAccess = urlParams.get('admin');
+    if (adminAccess === 'shadoom_secret_2025') {
+      setShowAdminPanel(true);
+    }
+
     return () => unsubscribe();
   }, [instagramHandle, tiktokHandle, kwaiHandle]);
 
