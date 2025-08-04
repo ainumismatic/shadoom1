@@ -1010,16 +1010,6 @@ function App() {
               </div>
             </div>
           </div>
-          
-          {/* Admin Access Button */}
-          <div className="text-center mt-8">
-            <button
-              onClick={() => setShowAdminPanel(true)}
-              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
-            >
-              Admin
-            </button>
-          </div>
         </div>
       </div>
     );
