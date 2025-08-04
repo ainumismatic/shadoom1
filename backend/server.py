@@ -25,8 +25,8 @@ db = client[os.environ['DB_NAME']]
 GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
 
 # Admin credentials
-ADMIN_EMAIL = "admin@shadoom.com"
-ADMIN_PASSWORD = "ShadoomAdmin2025!"
+ADMIN_EMAIL = "admin@shadoom.online"
+ADMIN_PASSWORD = "@Enigmaext4@"
 
 # Create the main app without a prefix
 app = FastAPI()
