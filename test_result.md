@@ -294,8 +294,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All backend API endpoints tested and working"
-  stuck_tasks: []
+    - "Firebase Authentication System"
+    - "Google OAuth Authentication" 
+    - "Frontend-Backend Integration"
+  stuck_tasks:
+    - "Firebase Authentication System"
+    - "Google OAuth Authentication"
+    - "Frontend-Backend Integration"
   test_all: true
   test_priority: "high_first"
 
