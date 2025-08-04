@@ -31,6 +31,519 @@ const provider = new GoogleAuthProvider();
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Admin Panel Component
+const AdminPanel = ({ onBack }) => {
+  const [adminAuth, setAdminAuth] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [dashboard, setDashboard] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [currentView, setCurrentView] = useState('login');
+  const [loading, setLoading] = useState(false);
+
+  const adminLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API}/admin/login`, {
+        email: adminEmail,
+        password: adminPassword
+      });
+      
+      if (response.data.success) {
+        setAdminAuth(true);
+        setCurrentView('dashboard');
+        loadDashboard();
+      }
+    } catch (error) {
+      alert('Credenciais inválidas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadDashboard = async () => {
+    try {
+      const dashResponse = await axios.get(`${API}/admin/dashboard`);
+      setDashboard(dashResponse.data);
+    } catch (error) {
+      console.error('Error loading dashboard:', error);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      const usersResponse = await axios.get(`${API}/admin/users`);
+      setUsers(usersResponse.data);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  };
+
+  const loadPayments = async () => {
+    try {
+      const paymentsResponse = await axios.get(`${API}/admin/payments`);
+      setPayments(paymentsResponse.data);
+    } catch (error) {
+      console.error('Error loading payments:', error);
+    }
+  };
+
+  const upgradeUser = async (userId) => {
+    try {
+      await axios.post(`${API}/admin/users/${userId}/upgrade`);
+      loadUsers();
+      loadDashboard();
+      alert('Usuário promovido para Premium!');
+    } catch (error) {
+      alert('Erro ao promover usuário');
+    }
+  };
+
+  const downgradeUser = async (userId) => {
+    try {
+      await axios.post(`${API}/admin/users/${userId}/downgrade`);
+      loadUsers();
+      loadDashboard();
+      alert('Usuário rebaixado para Free!');
+    } catch (error) {
+      alert('Erro ao rebaixar usuário');
+    }
+  };
+
+  if (!adminAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-4">
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 max-w-md w-full">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-2">🔐 Admin Shadoom</h2>
+            <p className="text-gray-300">Painel de Administração</p>
+          </div>
+
+          <form onSubmit={adminLogin} className="space-y-6">
+            <input
+              type="email"
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
+              placeholder="Email Admin"
+              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+            
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              placeholder="Senha Admin"
+              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+            >
+              {loading ? '⏳ Entrando...' : '🚀 Entrar'}
+            </button>
+          </form>
+
+          <div className="text-center mt-6">
+            <button
+              onClick={onBack}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              ← Voltar ao Shadoom
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
+      {/* Admin Header */}
+      <header className="bg-white/5 backdrop-blur-lg border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-white">👻 Admin Shadoom</h1>
+          
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => { setCurrentView('dashboard'); loadDashboard(); }}
+              className={`px-4 py-2 rounded-lg transition-colors ${currentView === 'dashboard' ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+            >
+              📊 Dashboard
+            </button>
+            
+            <button
+              onClick={() => { setCurrentView('users'); loadUsers(); }}
+              className={`px-4 py-2 rounded-lg transition-colors ${currentView === 'users' ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+            >
+              👥 Usuários
+            </button>
+            
+            <button
+              onClick={() => { setCurrentView('payments'); loadPayments(); }}
+              className={`px-4 py-2 rounded-lg transition-colors ${currentView === 'payments' ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+            >
+              💰 Pagamentos
+            </button>
+            
+            <button
+              onClick={onBack}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              ← Voltar ao Site
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Dashboard View */}
+        {currentView === 'dashboard' && dashboard && (
+          <div className="space-y-8">
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-white mb-2">📊 Dashboard</h2>
+              <p className="text-gray-300">Visão geral da plataforma Shadoom</p>
+            </div>
+
+            {/* Metrics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">👥</div>
+                <h3 className="text-lg font-bold text-white mb-1">Usuários Totais</h3>
+                <p className="text-3xl font-bold text-blue-400">{dashboard.total_users}</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">✨</div>
+                <h3 className="text-lg font-bold text-white mb-1">Usuários Premium</h3>
+                <p className="text-3xl font-bold text-green-400">{dashboard.premium_users}</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">💰</div>
+                <h3 className="text-lg font-bold text-white mb-1">Receita Total</h3>
+                <p className="text-3xl font-bold text-purple-400">R$ {dashboard.total_revenue.toFixed(2)}</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">📈</div>
+                <h3 className="text-lg font-bold text-white mb-1">Taxa de Conversão</h3>
+                <p className="text-3xl font-bold text-yellow-400">{dashboard.conversion_rate}%</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">🔥</div>
+                <h3 className="text-lg font-bold text-white mb-1">Usuários Ativos</h3>
+                <p className="text-3xl font-bold text-indigo-400">{dashboard.active_users}</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-teal-600/20 to-blue-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">💡</div>
+                <h3 className="text-lg font-bold text-white mb-1">Ideas Geradas</h3>
+                <p className="text-3xl font-bold text-teal-400">{dashboard.total_ideas}</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-orange-600/20 to-red-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">📅</div>
+                <h3 className="text-lg font-bold text-white mb-1">Novos Usuários (7d)</h3>
+                <p className="text-3xl font-bold text-orange-400">{dashboard.recent_signups}</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-pink-600/20 to-purple-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-2">💵</div>
+                <h3 className="text-lg font-bold text-white mb-1">Receita Mensal</h3>
+                <p className="text-3xl font-bold text-pink-400">R$ {dashboard.monthly_revenue.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Users View */}
+        {currentView === 'users' && (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-white mb-2">👥 Gestão de Usuários</h2>
+              <p className="text-gray-300">Gerenciar contas dos usuários</p>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-white/5">
+                    <tr>
+                      <th className="px-6 py-4 text-white font-semibold">Nome</th>
+                      <th className="px-6 py-4 text-white font-semibold">Email</th>
+                      <th className="px-6 py-4 text-white font-semibold">Plano</th>
+                      <th className="px-6 py-4 text-white font-semibold">Ideas</th>
+                      <th className="px-6 py-4 text-white font-semibold">Cadastro</th>
+                      <th className="px-6 py-4 text-white font-semibold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.id} className="border-t border-white/10 hover:bg-white/5">
+                        <td className="px-6 py-4 text-gray-300">{user.name}</td>
+                        <td className="px-6 py-4 text-gray-300">{user.email}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${user.plan === 'premium' ? 'bg-green-600/20 text-green-400' : 'bg-gray-600/20 text-gray-400'}`}>
+                            {user.plan === 'premium' ? '✨ Premium' : '🆓 Free'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-300">{user.ideas_generated}</td>
+                        <td className="px-6 py-4 text-gray-300">{new Date(user.created_at).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 space-x-2">
+                          {user.plan === 'free' ? (
+                            <button
+                              onClick={() => upgradeUser(user.id)}
+                              className="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-700 transition-colors"
+                            >
+                              ⬆️ Premium
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => downgradeUser(user.id)}
+                              className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-700 transition-colors"
+                            >
+                              ⬇️ Free
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payments View */}
+        {currentView === 'payments' && (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-white mb-2">💰 Histórico de Pagamentos</h2>
+              <p className="text-gray-300">Transações da plataforma</p>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-white/5">
+                    <tr>
+                      <th className="px-6 py-4 text-white font-semibold">Data</th>
+                      <th className="px-6 py-4 text-white font-semibold">Usuário</th>
+                      <th className="px-6 py-4 text-white font-semibold">Valor</th>
+                      <th className="px-6 py-4 text-white font-semibold">Método</th>
+                      <th className="px-6 py-4 text-white font-semibold">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.map((payment) => (
+                      <tr key={payment.id} className="border-t border-white/10 hover:bg-white/5">
+                        <td className="px-6 py-4 text-gray-300">{new Date(payment.created_at).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 text-gray-300">{payment.user_id}</td>
+                        <td className="px-6 py-4 text-gray-300">R$ {payment.amount.toFixed(2)}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${payment.payment_method === 'crypto' ? 'bg-orange-600/20 text-orange-400' : 'bg-blue-600/20 text-blue-400'}`}>
+                            {payment.payment_method === 'crypto' ? '₿ Crypto' : '💳 Card'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${payment.status === 'completed' ? 'bg-green-600/20 text-green-400' : payment.status === 'failed' ? 'bg-red-600/20 text-red-400' : 'bg-yellow-600/20 text-yellow-400'}`}>
+                            {payment.status === 'completed' ? '✅ Aprovado' : payment.status === 'failed' ? '❌ Falhou' : '⏳ Pendente'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+// Premium Purchase Modal
+const PremiumModal = ({ user, onClose, onSuccess }) => {
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [cardData, setCardData] = useState({
+    card_number: '',
+    expiry: '',
+    cvv: '',
+    name: ''
+  });
+  const [cryptoData, setCryptoData] = useState({
+    type: 'bitcoin',
+    address: ''
+  });
+  const [processing, setProcessing] = useState(false);
+
+  const handlePurchase = async () => {
+    setProcessing(true);
+    
+    try {
+      let payment_data = {};
+      
+      if (paymentMethod === 'card') {
+        payment_data = cardData;
+      } else {
+        payment_data = cryptoData;
+      }
+
+      const response = await axios.post(`${API}/purchase-premium`, {
+        user_id: user.id,
+        plan: 'premium',
+        payment_method: paymentMethod,
+        payment_data: payment_data
+      });
+
+      if (response.data.success) {
+        alert('🎉 Pagamento aprovado! Bem-vindo ao Premium!');
+        onSuccess();
+      } else {
+        alert('❌ ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Erro no pagamento. Tente novamente.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-gradient-to-br from-purple-900/90 to-pink-900/90 backdrop-blur-lg rounded-2xl p-8 border border-white/20 max-w-2xl w-full">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            ✨ Upgrade para Premium
+          </h2>
+          <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg rounded-xl p-6 border border-yellow-500/30 mb-6">
+            <div className="text-4xl mb-2">🚀</div>
+            <h3 className="text-2xl font-bold text-white mb-2">R$ 29,90/mês</h3>
+            <ul className="text-left text-white space-y-2">
+              <li>✅ <strong>Ideias ilimitadas</strong> com IA</li>
+              <li>✅ <strong>Análise completa</strong> do seu perfil</li>
+              <li>✅ <strong>Insights das redes sociais</strong></li>
+              <li>✅ <strong>Horários otimizados</strong> para posts</li>
+              <li>✅ <strong>Suporte prioritário</strong></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Payment Method Selection */}
+        <div className="mb-6">
+          <h3 className="text-lg font-bold text-white mb-4">Método de Pagamento:</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setPaymentMethod('card')}
+              className={`p-4 rounded-lg border transition-all ${paymentMethod === 'card' ? 'border-purple-400 bg-purple-600/20' : 'border-white/20 bg-white/5'}`}
+            >
+              <div className="text-2xl mb-2">💳</div>
+              <div className="text-white font-bold">Cartão de Crédito</div>
+            </button>
+            
+            <button
+              onClick={() => setPaymentMethod('crypto')}
+              className={`p-4 rounded-lg border transition-all ${paymentMethod === 'crypto' ? 'border-orange-400 bg-orange-600/20' : 'border-white/20 bg-white/5'}`}
+            >
+              <div className="text-2xl mb-2">₿</div>
+              <div className="text-white font-bold">Criptomoedas</div>
+            </button>
+          </div>
+        </div>
+
+        {/* Payment Forms */}
+        {paymentMethod === 'card' && (
+          <div className="space-y-4 mb-6">
+            <input
+              type="text"
+              placeholder="Nome no Cartão"
+              value={cardData.name}
+              onChange={(e) => setCardData({...cardData, name: e.target.value})}
+              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
+            <input
+              type="text"
+              placeholder="Número do Cartão"
+              value={cardData.card_number}
+              onChange={(e) => setCardData({...cardData, card_number: e.target.value})}
+              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="MM/AA"
+                value={cardData.expiry}
+                onChange={(e) => setCardData({...cardData, expiry: e.target.value})}
+                className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              />
+              <input
+                type="text"
+                placeholder="CVV"
+                value={cardData.cvv}
+                onChange={(e) => setCardData({...cardData, cvv: e.target.value})}
+                className="px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              />
+            </div>
+          </div>
+        )}
+
+        {paymentMethod === 'crypto' && (
+          <div className="space-y-4 mb-6">
+            <select
+              value={cryptoData.type}
+              onChange={(e) => setCryptoData({...cryptoData, type: e.target.value})}
+              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-orange-400"
+            >
+              <option value="bitcoin">Bitcoin (BTC)</option>
+              <option value="ethereum">Ethereum (ETH)</option>
+              <option value="usdt">Tether (USDT)</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Seu endereço da carteira"
+              value={cryptoData.address}
+              onChange={(e) => setCryptoData({...cryptoData, address: e.target.value})}
+              className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+            <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg p-4">
+              <p className="text-orange-200 text-sm">
+                💡 <strong>Instruções:</strong> Após confirmar, você receberá o endereço para envio da criptomoeda. O upgrade será ativado automaticamente após confirmação da transação.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex space-x-4">
+          <button
+            onClick={onClose}
+            className="flex-1 bg-white/10 text-white py-3 rounded-lg font-bold hover:bg-white/20 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handlePurchase}
+            disabled={processing}
+            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-300"
+          >
+            {processing ? '⏳ Processando...' : `💳 Pagar R$ 29,90`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +552,8 @@ function App() {
   const [generating, setGenerating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showProfileAnalysis, setShowProfileAnalysis] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [profileAnalysis, setProfileAnalysis] = useState(null);
   const [analyzingProfile, setAnalyzingProfile] = useState(false);
   
@@ -67,7 +582,7 @@ function App() {
             kwai_handle: kwaiHandle || null
           };
           
-          console.log('Creating user with data:', userData); // Debug log
+          console.log('Creating user with data:', userData);
           
           const response = await axios.post(`${API}/users`, userData);
           setUser(response.data);
@@ -76,7 +591,7 @@ function App() {
           loadUserIdeas(response.data.id);
         } catch (error) {
           console.error('Error creating user:', error);
-          console.error('Error details:', error.response?.data); // Debug log
+          console.error('Error details:', error.response?.data);
           
           // Clear Firebase auth if backend fails
           if (error.response?.status === 422) {
@@ -98,7 +613,6 @@ function App() {
     setAuthLoading(true);
     setAuthError('');
     try {
-      // Add additional domain configuration
       provider.setCustomParameters({
         prompt: 'select_account'
       });
@@ -106,7 +620,7 @@ function App() {
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error('Login error:', error);
-      console.error('Error code:', error.code); // Debug log
+      console.error('Error code:', error.code);
       
       switch (error.code) {
         case 'auth/unauthorized-domain':
@@ -137,15 +651,12 @@ function App() {
     setAuthError('');
     
     try {
-      // Create user account
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Update profile with name
       await updateProfile(userCredential.user, {
         displayName: name
       });
       
-      // Clear form
       setEmail('');
       setPassword('');
       setName('');
@@ -185,8 +696,6 @@ function App() {
     
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      
-      // Clear form
       setEmail('');
       setPassword('');
       
@@ -280,21 +789,14 @@ function App() {
     }
   };
 
-  const upgradeToPremium = async () => {
+  const handlePremiumSuccess = async () => {
+    // Reload user data
     try {
-      await axios.post(`${API}/upgrade-plan`, {
-        user_id: user.id,
-        plan: "premium"
-      });
-      
-      // Update user data
       const userResponse = await axios.get(`${API}/users/${user.email}`);
       setUser(userResponse.data);
-      
-      alert('Upgrade para Premium realizado com sucesso! 🎉');
+      setShowPremiumModal(false);
     } catch (error) {
-      console.error('Error upgrading plan:', error);
-      alert('Erro ao fazer upgrade. Tente novamente!');
+      console.error('Error reloading user:', error);
     }
   };
 
@@ -311,6 +813,10 @@ function App() {
     navigator.clipboard.writeText(text);
     alert('Copiado para área de transferência! 📋');
   };
+
+  if (showAdminPanel) {
+    return <AdminPanel onBack={() => setShowAdminPanel(false)} />;
+  }
 
   if (loading) {
     return (
@@ -504,6 +1010,16 @@ function App() {
               </div>
             </div>
           </div>
+          
+          {/* Admin Access Button */}
+          <div className="text-center mt-8">
+            <button
+              onClick={() => setShowAdminPanel(true)}
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              Admin
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -526,7 +1042,7 @@ function App() {
           <div className="flex items-center space-x-4">
             {user.plan === 'free' && (
               <button
-                onClick={upgradeToPremium}
+                onClick={() => setShowPremiumModal(true)}
                 className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 transition-all duration-300 text-sm"
               >
                 ⭐ Upgrade Premium
@@ -827,6 +1343,15 @@ function App() {
         )}
       </main>
 
+      {/* Premium Modal */}
+      {showPremiumModal && (
+        <PremiumModal 
+          user={user} 
+          onClose={() => setShowPremiumModal(false)}
+          onSuccess={handlePremiumSuccess}
+        />
+      )}
+
       {/* Footer */}
       <footer className="mt-16 bg-black/20 backdrop-blur-lg border-t border-white/10">
         <div className="max-w-6xl mx-auto px-4 py-6 text-center">
@@ -834,7 +1359,7 @@ function App() {
             👻 Shadoom - Seu assistente invisível para engajamento máximo
           </p>
           <p className="text-purple-300 text-sm mt-2">
-            {user.plan === 'premium' ? 'Premium' : 'Free'} • Powered by Gemini AI • Análise completa de perfil
+            {user.plan === 'premium' ? 'Premium' : 'Free'} • Powered by Gemini AI • Sistema completo de pagamentos
           </p>
         </div>
       </footer>

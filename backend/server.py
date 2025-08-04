@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json
 import re
@@ -23,6 +23,10 @@ db = client[os.environ['DB_NAME']]
 
 # Gemini API key
 GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
+
+# Admin credentials
+ADMIN_EMAIL = "admin@shadoom.com"
+ADMIN_PASSWORD = "ShadoomAdmin2025!"
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -55,7 +59,12 @@ class User(BaseModel):
     tiktok_handle: Optional[str] = None
     kwai_handle: Optional[str] = None
     ideas_generated: int = 0
+    subscription_date: Optional[datetime] = None
+    subscription_expires: Optional[datetime] = None
+    total_paid: float = 0.0
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_active: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
 
 class UserCreate(BaseModel):
     email: str
@@ -65,9 +74,25 @@ class UserCreate(BaseModel):
     tiktok_handle: Optional[str] = None
     kwai_handle: Optional[str] = None
 
-class PlanUpgrade(BaseModel):
+class AdminLogin(BaseModel):
+    email: str
+    password: str
+
+class PurchaseRequest(BaseModel):
     user_id: str
-    plan: str  # "premium"
+    plan: str = "premium"
+    payment_method: str  # "card", "crypto"
+    payment_data: dict
+
+class PaymentRecord(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    amount: float
+    currency: str
+    payment_method: str
+    payment_data: dict
+    status: str = "pending"  # pending, completed, failed
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class ProfileAnalysis(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -81,15 +106,140 @@ class ProfileAnalysis(BaseModel):
     content_performance: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Admin auth dependency
+def verify_admin(email: str, password: str):
+    return email == ADMIN_EMAIL and password == ADMIN_PASSWORD
+
 @api_router.get("/")
 async def root():
     return {"message": "Shadoom API - Seu Gerenciador Fantasma de Engajamento! 👻"}
+
+@api_router.post("/admin/login")
+async def admin_login(credentials: AdminLogin):
+    if verify_admin(credentials.email, credentials.password):
+        return {
+            "success": True,
+            "admin_token": "shadoom_admin_2025",
+            "message": "Login admin realizado com sucesso"
+        }
+    raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+@api_router.get("/admin/dashboard")
+async def admin_dashboard():
+    try:
+        # Total users
+        total_users = await db.users.count_documents({})
+        
+        # Active users (logged in last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        active_users = await db.users.count_documents({
+            "last_active": {"$gte": thirty_days_ago}
+        })
+        
+        # Premium users
+        premium_users = await db.users.count_documents({"plan": "premium"})
+        
+        # Total revenue
+        payments = await db.payments.find({"status": "completed"}).to_list(1000)
+        total_revenue = sum(payment["amount"] for payment in payments)
+        
+        # Recent signups (last 7 days)
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        recent_signups = await db.users.count_documents({
+            "created_at": {"$gte": seven_days_ago}
+        })
+        
+        # Total ideas generated
+        total_ideas = await db.content_ideas.count_documents({})
+        
+        # Monthly revenue
+        current_month = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        monthly_payments = await db.payments.find({
+            "status": "completed",
+            "created_at": {"$gte": current_month}
+        }).to_list(100)
+        monthly_revenue = sum(payment["amount"] for payment in monthly_payments)
+        
+        return {
+            "total_users": total_users,
+            "active_users": active_users,
+            "premium_users": premium_users,
+            "free_users": total_users - premium_users,
+            "total_revenue": total_revenue,
+            "monthly_revenue": monthly_revenue,
+            "recent_signups": recent_signups,
+            "total_ideas": total_ideas,
+            "conversion_rate": round((premium_users / total_users * 100) if total_users > 0 else 0, 2)
+        }
+    except Exception as e:
+        print(f"Dashboard error: {e}")
+        return {
+            "total_users": 0,
+            "active_users": 0,
+            "premium_users": 0,
+            "free_users": 0,
+            "total_revenue": 0.0,
+            "monthly_revenue": 0.0,
+            "recent_signups": 0,
+            "total_ideas": 0,
+            "conversion_rate": 0.0
+        }
+
+@api_router.get("/admin/users")
+async def admin_get_users():
+    users = await db.users.find().sort("created_at", -1).to_list(100)
+    return [User(**user) for user in users]
+
+@api_router.post("/admin/users/{user_id}/upgrade")
+async def admin_upgrade_user(user_id: str):
+    result = await db.users.update_one(
+        {"id": user_id},
+        {
+            "$set": {
+                "plan": "premium",
+                "subscription_date": datetime.utcnow(),
+                "subscription_expires": datetime.utcnow() + timedelta(days=30)
+            }
+        }
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User upgraded to premium"}
+
+@api_router.post("/admin/users/{user_id}/downgrade")
+async def admin_downgrade_user(user_id: str):
+    result = await db.users.update_one(
+        {"id": user_id},
+        {
+            "$set": {
+                "plan": "free",
+                "subscription_expires": None
+            }
+        }
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User downgraded to free"}
+
+@api_router.get("/admin/payments")
+async def admin_get_payments():
+    payments = await db.payments.find().sort("created_at", -1).to_list(100)
+    return [PaymentRecord(**payment) for payment in payments]
 
 @api_router.post("/users", response_model=User)
 async def create_user(user_data: UserCreate):
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email})
     if existing_user:
+        # Update last_active
+        await db.users.update_one(
+            {"email": user_data.email},
+            {"$set": {"last_active": datetime.utcnow()}}
+        )
         return User(**existing_user)
     
     user_dict = user_data.dict()
@@ -102,20 +252,90 @@ async def get_user(email: str):
     user = await db.users.find_one({"email": email})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return User(**user)
-
-@api_router.post("/upgrade-plan")
-async def upgrade_plan(request: PlanUpgrade):
-    # Update user plan
-    result = await db.users.update_one(
-        {"id": request.user_id},
-        {"$set": {"plan": request.plan}}
+    
+    # Update last_active
+    await db.users.update_one(
+        {"email": email},
+        {"$set": {"last_active": datetime.utcnow()}}
     )
     
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return {"message": "Plan upgraded successfully"}
+    return User(**user)
+
+@api_router.post("/purchase-premium")
+async def purchase_premium(request: PurchaseRequest):
+    try:
+        # Get user
+        user = await db.users.find_one({"id": request.user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Premium pricing
+        amount = 29.90  # R$ 29,90/mês
+        
+        # Create payment record
+        payment_record = PaymentRecord(
+            user_id=request.user_id,
+            amount=amount,
+            currency="BRL",
+            payment_method=request.payment_method,
+            payment_data=request.payment_data,
+            status="pending"
+        )
+        
+        # Simulate payment processing
+        if request.payment_method == "crypto":
+            # Crypto payment simulation
+            crypto_address = request.payment_data.get("address", "")
+            crypto_type = request.payment_data.get("type", "bitcoin")
+            
+            if crypto_address and len(crypto_address) > 20:
+                payment_record.status = "completed"
+            else:
+                payment_record.status = "failed"
+                
+        elif request.payment_method == "card":
+            # Card payment simulation  
+            card_number = request.payment_data.get("card_number", "")
+            if card_number and len(card_number) >= 16:
+                payment_record.status = "completed"
+            else:
+                payment_record.status = "failed"
+        
+        # Save payment record
+        await db.payments.insert_one(payment_record.dict())
+        
+        if payment_record.status == "completed":
+            # Upgrade user to premium
+            subscription_expires = datetime.utcnow() + timedelta(days=30)
+            await db.users.update_one(
+                {"id": request.user_id},
+                {
+                    "$set": {
+                        "plan": "premium",
+                        "subscription_date": datetime.utcnow(),
+                        "subscription_expires": subscription_expires
+                    },
+                    "$inc": {"total_paid": amount}
+                }
+            )
+            
+            return {
+                "success": True,
+                "payment_id": payment_record.id,
+                "message": "Pagamento aprovado! Bem-vindo ao Premium! 🎉",
+                "expires_at": subscription_expires
+            }
+        else:
+            return {
+                "success": False,
+                "payment_id": payment_record.id,
+                "message": "Pagamento falhou. Tente novamente.",
+                "error": "Invalid payment data"
+            }
+            
+    except Exception as e:
+        print(f"Payment error: {e}")
+        raise HTTPException(status_code=500, detail="Erro no processamento do pagamento")
 
 @api_router.post("/generate-ideas", response_model=List[ContentIdea])
 async def generate_content_ideas(request: ContentIdeaCreate):
@@ -209,38 +429,75 @@ async def generate_content_ideas(request: ContentIdeaCreate):
         except (json.JSONDecodeError, ValueError, KeyError) as e:
             print(f"Failed to parse AI response: {e}")
             # Enhanced fallback with better ideas
-            fallback_ideas = [
-                {
-                    "title": f"🔥 {request.topic}: O Segredo que MUDOU Minha Vida!",
-                    "script": f"1. 'Eu costumava ter ZERO resultados com {request.topic}...'\n2. O momento que tudo mudou para mim\n3. A estratégia simples que NINGUÉM conta\n4. 'Se você chegou até aqui, comenta AI que eu compartilho mais!'",
-                    "content_type": "Reels",
-                    "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#segredo", "#viral", "#resultados", "#mudanca", "#dica"]
-                },
-                {
-                    "title": f"⚠️ PARE TUDO! Você está fazendo {request.topic} ERRADO",
-                    "script": f"1. 'Se você faz {request.topic} assim, PARE AGORA!'\n2. Os 3 erros que TODOS cometem\n3. A forma CORRETA (que poucos sabem)\n4. 'Salva este post e me agradece depois ❤️'",
-                    "content_type": "Post",
-                    "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#erro", "#alerta", "#dicavaliosa", "#salvavidas", "#importante"]
-                },
-                {
-                    "title": f"✨ Como {request.topic} me fez ganhar R$ 10.000/mês",
-                    "script": f"1. Minha vida ANTES de descobrir {request.topic}\n2. O que mudou quando apliquei isso\n3. Resultados em 30, 60 e 90 dias\n4. 'Quer saber como? Me chama no direct!'",
-                    "content_type": "Stories",
-                    "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#renda", "#transformacao", "#resultados", "#sucesso", "#dinheiro"]
-                },
-                {
-                    "title": f"🎯 {request.topic} em 60 Segundos - MÉTODO RÁPIDO",
-                    "script": f"1. 'Você tem 1 minuto? Vou te ensinar {request.topic}'\n2. Passo 1: O básico que você DEVE saber\n3. Passo 2: O truque que acelera tudo\n4. 'Funcionou? Conta aqui nos comentários!'",
-                    "content_type": "Reels",
-                    "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#rapidinha", "#metodo", "#pratico", "#funciona", "#testado"]
-                },
-                {
-                    "title": f"💰 ANTES vs DEPOIS: Minha jornada com {request.topic}",
-                    "script": f"1. ANTES: Minha situação era essa...\n2. DURANTE: O processo que segui\n3. DEPOIS: Onde estou hoje graças a {request.topic}\n4. 'Qual parte da sua jornada você está?'",
-                    "content_type": "Post",
-                    "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#antesedepois", "#jornada", "#evolucao", "#inspiracao", "#motivacao"]
-                }
-            ]
+            topic_lower = request.topic.lower()
+            
+            if "fitness" in topic_lower or "treino" in topic_lower or "academia" in topic_lower:
+                fallback_ideas = [
+                    {
+                        "title": f"🔥 Transformei meu corpo em 90 dias com {request.topic} - RESULTADO CHOCANTE!",
+                        "script": f"1. 'Há 90 dias eu odiava me olhar no espelho...'\n2. Como descobri {request.topic} que mudou TUDO\n3. A rotina simples que me deu resultado (sem dieta maluca)\n4. 'Se você quer o mesmo, salva este post e me segue!'",
+                        "content_type": "Reels",
+                        "hashtags": ["#fitness", "#transformacao", "#90dias", "#antesedepois", "#motivacao", "#treino", "#resultado", "#corpodossonhos"]
+                    },
+                    {
+                        "title": f"⚠️ PARE de fazer {request.topic} se você não sabe ISSO!",
+                        "script": f"1. '95% das pessoas fazem {request.topic} ERRADO'\n2. O erro que te impede de ver resultados\n3. A forma correta (que personal trainer cobra R$ 300)\n4. 'Compartilha para salvar alguém!'",
+                        "content_type": "Post",
+                        "hashtags": ["#fitness", "#erro", "#dicavaliosa", "#personal", "#treino", "#academia", "#segredo", "#resultado"]
+                    },
+                    {
+                        "title": f"💪 {request.topic}: 5 minutos que valem por 1 hora de academia!",
+                        "script": f"1. 'Sem tempo para treinar? Este vídeo é para você!'\n2. Exercício 1: O básico que funciona\n3. Exercício 2: O que acelera o metabolismo\n4. 'Faz junto comigo e me marca nos stories!'",
+                        "content_type": "Reels",
+                        "hashtags": ["#fitness", "#5minutos", "#caseiro", "#pratico", "#rapido", "#funciona", "#treino", "#metabolismo"]
+                    },
+                    {
+                        "title": f"✨ ANTES vs DEPOIS: Minha jornada com {request.topic}",
+                        "script": f"1. ANTES: Como estava minha situação\n2. Durante: O processo que segui com {request.topic}\n3. DEPOIS: Onde estou hoje (resultado real)\n4. 'Qual parte da jornada você está?'",
+                        "content_type": "Stories",
+                        "hashtags": ["#fitness", "#antesedepois", "#jornada", "#processo", "#real", "#inspiracao", "#motivacao", "#transformacao"]
+                    },
+                    {
+                        "title": f"🎯 {request.topic} em 60 segundos - MÉTODO TESTADO!",
+                        "script": f"1. 'Você tem 1 minuto? Vou te ensinar {request.topic}'\n2. Passo 1: O básico essencial\n3. Passo 2: O segredo que acelera\n4. 'Funcionou? Conta aqui embaixo!'",
+                        "content_type": "Reels",
+                        "hashtags": ["#fitness", "#1minuto", "#metodo", "#rapido", "#testado", "#funciona", "#treino", "#dica"]
+                    }
+                ]
+            else:
+                # Generic fallback for any topic
+                fallback_ideas = [
+                    {
+                        "title": f"🔥 {request.topic}: O que MUDOU minha vida em 30 dias!",
+                        "script": f"1. 'Há 30 dias eu não sabia nada sobre {request.topic}...'\n2. A descoberta que virou minha chave\n3. Os resultados que consegui (sem mentira)\n4. 'Se funcionar com você, me marca nos stories!'",
+                        "content_type": "Reels",
+                        "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#30dias", "#mudanca", "#resultado", "#funciona", "#viral"]
+                    },
+                    {
+                        "title": f"⚠️ TODO mundo faz {request.topic} ERRADO - eu também fazia!",
+                        "script": f"1. 'Se você faz {request.topic} assim, PARE AGORA!'\n2. O erro que TODO mundo comete\n3. A forma certa (que poucos conhecem)\n4. 'Salva este post e me agradece depois!'",
+                        "content_type": "Post", 
+                        "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#erro", "#alerta", "#dicavaliosa", "#certo", "#importante"]
+                    },
+                    {
+                        "title": f"✨ ANTES vs DEPOIS: Minha jornada com {request.topic}",
+                        "script": f"1. ANTES: Como estava minha situação\n2. Durante: O processo que segui com {request.topic}\n3. DEPOIS: Onde estou hoje (resultado real)\n4. 'Qual parte da jornada você está?'",
+                        "content_type": "Stories",
+                        "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#antesedepois", "#jornada", "#processo", "#real", "#inspiracao"]
+                    },
+                    {
+                        "title": f"🎯 {request.topic} em 60 segundos - MÉTODO TESTADO!",
+                        "script": f"1. 'Você tem 1 minuto? Vou te ensinar {request.topic}'\n2. Passo 1: O básico essencial\n3. Passo 2: O segredo que acelera\n4. 'Funcionou? Conta aqui embaixo!'",
+                        "content_type": "Reels",
+                        "hashtags": [f"#{request.topic.lower().replace(' '', '')}", "#1minuto", "#metodo", "#rapido", "#testado", "#funciona"]
+                    },
+                    {
+                        "title": f"💡 5 erros em {request.topic} que te impedem de ter resultado!",
+                        "script": f"1. Erro 1: O que TODO mundo faz errado\n2. Erro 2: A armadilha que eu caí também\n3. Erro 3: O desperdício de tempo/dinheiro\n4. 'Você comete algum? Me fala nos comentários!'",
+                        "content_type": "Post",
+                        "hashtags": [f"#{request.topic.lower().replace(' ', '')}", "#5erros", "#evite", "#resultado", "#dica", "#cuidado"]
+                    }
+                ]
             
             for idea_data in fallback_ideas:
                 content_idea = ContentIdea(
