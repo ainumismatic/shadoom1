@@ -306,13 +306,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Firebase Authentication System"
-    - "Google OAuth Authentication" 
-    - "Frontend-Backend Integration"
-  stuck_tasks:
-    - "Firebase Authentication System"
-    - "Google OAuth Authentication"
-    - "Frontend-Backend Integration"
+    - "Ideas Generation Feature"
+    - "History and Ideas Management"
+  stuck_tasks: []
   test_all: true
   test_priority: "high_first"
 
