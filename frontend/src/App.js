@@ -231,59 +231,146 @@ function App() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Hero Section */}
-          <div className="mb-12">
-            <div className="mb-8">
-              <img 
-                src="https://images.pexels.com/photos/7233189/pexels-photo-7233189.jpeg" 
-                alt="Shadoom AI Background"
-                className="w-full h-96 object-cover rounded-2xl shadow-2xl mb-8 opacity-80"
-              />
-            </div>
+        <div className="max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             
-            <h1 className="text-6xl font-bold text-white mb-6">
-              👻 <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Shadoom</span>
-            </h1>
-            <p className="text-2xl text-purple-200 mb-4">
-              Seu Gerenciador Fantasma de Engajamento
-            </p>
-            <p className="text-lg text-purple-300 max-w-3xl mx-auto mb-12">
-              O aplicativo invisível que automatiza, organiza e protege suas estratégias de engajamento. 
-              <strong className="text-purple-200"> Banco Secreto de Ideas com IA</strong> - nunca mais fique sem conteúdo!
-            </p>
-          </div>
+            {/* Left side - Branding */}
+            <div className="text-center lg:text-left">
+              <div className="mb-8">
+                <img 
+                  src="https://images.pexels.com/photos/8728386/pexels-photo-8728386.jpeg" 
+                  alt="Shadoom AI Technology"
+                  className="w-full h-72 object-cover rounded-2xl shadow-2xl mb-6 opacity-90"
+                />
+              </div>
+              
+              <h1 className="text-5xl lg:text-6xl font-bold text-white mb-4">
+                👻 <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Shadoom</span>
+              </h1>
+              <p className="text-xl text-purple-200 mb-4">
+                Seu Gerenciador Fantasma de Engajamento
+              </p>
+              <p className="text-purple-300 max-w-lg mx-auto lg:mx-0 mb-8">
+                Banco Secreto de Ideas com IA • Nunca mais fique sem conteúdo para postar!
+              </p>
+              
+              {/* Features */}
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl mb-2">🤖</div>
+                  <p className="text-purple-200 text-sm">IA Criativa</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl mb-2">📱</div>
+                  <p className="text-purple-200 text-sm">Multi-Formato</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl mb-2">🎯</div>
+                  <p className="text-purple-200 text-sm">Hashtags IA</p>
+                </div>
+              </div>
+            </div>
 
-          {/* Features Preview */}
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="text-xl font-bold text-white mb-2">IA Criativa</h3>
-              <p className="text-purple-200">Ideias personalizadas com roteiros prontos</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-              <div className="text-4xl mb-4">📱</div>
-              <h3 className="text-xl font-bold text-white mb-2">Multi-Formato</h3>
-              <p className="text-purple-200">Reels, Posts, Stories - tudo coberto</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-xl font-bold text-white mb-2">Hashtags Inteligentes</h3>
-              <p className="text-purple-200">Tags otimizadas para máximo alcance</p>
+            {/* Right side - Auth Form */}
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {showLogin ? 'Entrar na Shadoom' : 'Criar Conta Grátis'}
+                </h2>
+                <p className="text-purple-200">
+                  {showLogin ? 'Bem-vindo de volta!' : 'Comece a gerar ideias agora'}
+                </p>
+              </div>
+
+              {/* Error Message */}
+              {authError && (
+                <div className="bg-red-500/20 border border-red-500/30 text-red-200 p-3 rounded-lg mb-4 text-sm">
+                  {authError}
+                </div>
+              )}
+
+              {/* Email/Password Form */}
+              <form onSubmit={showLogin ? signInWithEmail : signUpWithEmail} className="space-y-4 mb-6">
+                {!showLogin && (
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome completo"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    disabled={authLoading}
+                  />
+                )}
+                
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Seu email"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  disabled={authLoading}
+                />
+                
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Sua senha"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  disabled={authLoading}
+                />
+                
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300"
+                >
+                  {authLoading ? '⏳ Carregando...' : showLogin ? '🚀 Entrar' : '✨ Criar Conta'}
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/20"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-transparent text-purple-200">ou</span>
+                </div>
+              </div>
+
+              {/* Google Login */}
+              <button
+                onClick={signInWithGoogle}
+                disabled={authLoading}
+                className="w-full bg-white text-gray-800 py-3 px-4 rounded-lg font-bold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 mb-6"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                <span>Entrar com Google</span>
+              </button>
+
+              {/* Toggle Form */}
+              <div className="text-center">
+                <button
+                  onClick={() => {
+                    setShowLogin(!showLogin);
+                    setAuthError('');
+                    setEmail('');
+                    setPassword('');
+                    setName('');
+                  }}
+                  className="text-purple-300 hover:text-white transition-colors"
+                >
+                  {showLogin ? 'Não tem conta? Criar agora' : 'Já tem conta? Entrar'}
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Login Button */}
-          <button
-            onClick={signInWithGoogle}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-4 rounded-full font-bold text-lg hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-300 shadow-2xl"
-          >
-            🚀 Entrar com Google & Começar
-          </button>
-          
-          <p className="text-sm text-purple-300 mt-6">
-            Gratuito para começar • IA Premium disponível
-          </p>
         </div>
       </div>
     );
