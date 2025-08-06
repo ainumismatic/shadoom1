@@ -58,202 +58,117 @@ html {
 
 /* Mobile-first responsive design */
 @media (max-width: 640px) {
-  /* Typography adjustments for mobile */
-  .text-6xl {
-    font-size: 2.5rem !important;
-    line-height: 1.2;
-  }
-  
-  .text-5xl {
-    font-size: 2rem !important;
-    line-height: 1.2;
-  }
-  
-  .text-4xl {
-    font-size: 1.75rem !important;
-    line-height: 1.2;
-  }
-  
-  .text-3xl {
-    font-size: 1.5rem !important;
-    line-height: 1.2;
-  }
-  
-  .text-2xl {
-    font-size: 1.25rem !important;
-    line-height: 1.3;
-  }
-  
-  .text-xl {
-    font-size: 1.1rem !important;
-    line-height: 1.4;
-  }
-  
-  /* Mobile container adjustments */
-  .max-w-5xl {
+  .text-6xl { font-size: 2.5rem !important; line-height: 1.2; }
+  .text-5xl { font-size: 2rem !important; line-height: 1.2; }
+  .text-4xl { font-size: 1.75rem !important; line-height: 1.2; }
+  .text-3xl { font-size: 1.5rem !important; line-height: 1.2; }
+  .text-2xl { font-size: 1.25rem !important; line-height: 1.3; }
+  .text-xl { font-size: 1.1rem !important; line-height: 1.4; }
+
+  .max-w-5xl, .max-w-4xl, .max-w-2xl {
     max-width: 100% !important;
     padding: 0 1rem;
   }
-  
-  .max-w-4xl {
-    max-width: 100% !important;
-    padding: 0 1rem;
-  }
-  
-  .max-w-2xl {
-    max-width: 100% !important;
-  }
-  
-  /* Grid improvements for mobile */
+
   .grid {
+    display: grid !important;
     grid-template-columns: 1fr !important;
   }
-  
-  .lg:grid-cols-2 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .lg:grid-cols-3 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .md:grid-cols-2 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .md:grid-cols-3 {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  
-  /* Button improvements for touch */
+
   button {
     min-height: 44px !important;
     font-size: 0.9rem !important;
     padding: 0.75rem 1rem !important;
   }
-  
-  /* Input improvements for mobile */
+
   input, select, textarea {
-    font-size: 16px !important; /* Prevents zoom on iOS */
+    font-size: 16px !important;
     min-height: 44px !important;
     padding: 0.75rem !important;
   }
-  
-  /* Modal improvements */
+
   .fixed.inset-0 > div {
     margin: 1rem !important;
     max-height: calc(100vh - 2rem) !important;
     overflow-y: auto !important;
   }
-  
-  /* Header mobile */
-  .max-w-6xl.mx-auto.px-4.py-4 {
+
+  .header-mobile {
     flex-wrap: wrap !important;
     gap: 0.5rem;
   }
-  
-  .max-w-6xl.mx-auto.px-4.py-4 > div:first-child {
+
+  .header-mobile > div:first-child {
     flex: 1;
     min-width: 200px;
   }
-  
-  .max-w-6xl.mx-auto.px-4.py-4 > div:last-child {
+
+  .header-mobile > div:last-child {
     flex-wrap: wrap !important;
     gap: 0.5rem;
   }
-  
-  /* Cards mobile spacing */
-  .bg-white/10.backdrop-blur-lg.rounded-xl {
+
+  .card-mobile {
     margin-bottom: 1rem !important;
   }
-  
-  /* Touch-friendly spacing */
-  .space-x-2 > * + * {
-    margin-left: 0.25rem !important;
-  }
-  
-  .space-x-4 > * + * {
-    margin-left: 0.5rem !important;
-  }
-  
-  /* Mobile navigation improvements */
-  .flex.items-center.space-x-4 {
-    flex-wrap: wrap !important;
-    gap: 0.5rem;
-  }
-  
-  /* Mobile form improvements */
-  .grid.grid-cols-2.gap-2 {
+
+  .space-x-2 > * + * { margin-left: 0.25rem !important; }
+  .space-x-4 > * + * { margin-left: 0.5rem !important; }
+
+  .form-grid-mobile {
+    display: grid;
     grid-template-columns: 1fr !important;
     gap: 0.5rem !important;
   }
-  
-  /* Mobile padding adjustments */
-  .p-8 {
-    padding: 1.5rem !important;
-  }
-  
-  .p-6 {
-    padding: 1rem !important;
-  }
-  
-  .py-8 {
-    padding-top: 1.5rem !important;
-    padding-bottom: 1.5rem !important;
-  }
-  
-  .px-8 {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-  
-  /* Mobile margin adjustments */
-  .mb-12 {
-    margin-bottom: 2rem !important;
-  }
-  
-  .mb-8 {
-    margin-bottom: 1.5rem !important;
-  }
-  
-  /* Mobile image sizing */
-  .h-72 {
-    height: 200px !important;
-  }
-  
-  .h-96 {
-    height: 250px !important;
-  }
-  
-  /* Mobile admin table */
+
+  .p-8 { padding: 1.5rem !important; }
+  .p-6 { padding: 1rem !important; }
+  .py-8 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+  .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+  .mb-12 { margin-bottom: 2rem !important; }
+  .mb-8 { margin-bottom: 1.5rem !important; }
+
+  .h-72 { height: 200px !important; }
+  .h-96 { height: 250px !important; }
+
   .overflow-x-auto table {
     font-size: 0.75rem !important;
   }
-  
+
   .overflow-x-auto table th,
   .overflow-x-auto table td {
     padding: 0.5rem !important;
     min-width: 80px;
   }
+
+  footer {
+    padding: 1rem !important;
+    text-align: center;
+  }
+
+  footer p {
+    font-size: 0.875rem !important;
+    line-height: 1.5;
+  }
+
+  .modal-mobile {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+  }
 }
 
 /* Tablet adjustments */
 @media (min-width: 641px) and (max-width: 1024px) {
-  .text-6xl {
-    font-size: 3rem !important;
-  }
-  
-  .text-5xl {
-    font-size: 2.5rem !important;
-  }
-  
-  .grid.md:grid-cols-3 {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  
-  .lg:grid-cols-3 {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+  .text-6xl { font-size: 3rem !important; }
+  .text-5xl { font-size: 2.5rem !important; }
 }
 
 /* Mobile landscape adjustments */
@@ -262,15 +177,15 @@ html {
     min-height: auto !important;
     padding-bottom: 2rem;
   }
-  
+
   .h-72, .h-96 {
     height: 150px !important;
   }
-  
+
   .text-6xl {
     font-size: 2rem !important;
   }
-  
+
   .py-8 {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
@@ -289,22 +204,14 @@ html {
   button {
     transform: none !important;
   }
-  
+
   button:active {
     transform: scale(0.98) !important;
     transition: transform 0.1s ease !important;
   }
-  
-  .hover:scale-105:hover {
-    transform: none !important;
-  }
-  
-  .hover:scale-105:active {
-    transform: scale(0.98) !important;
-  }
 }
 
-/* Loading states for mobile */
+/* Loading states */
 @keyframes pulse-mobile {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
@@ -314,42 +221,12 @@ html {
   animation: pulse-mobile 1.5s ease-in-out infinite;
 }
 
-/* Mobile-specific utility classes */
 .mobile-safe-area {
   padding-bottom: env(safe-area-inset-bottom);
   padding-top: env(safe-area-inset-top);
 }
 
-/* Improved touch targets */
 .touch-target {
   min-width: 44px !important;
   min-height: 44px !important;
-}
-
-/* Mobile modal fixes */
-@media (max-width: 640px) {
-  .modal-mobile {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    max-height: 100vh !important;
-    overflow-y: auto !important;
-  }
-}
-
-/* Mobile footer improvements */
-@media (max-width: 640px) {
-  footer {
-    padding: 1rem !important;
-    text-align: center;
-  }
-  
-  footer p {
-    font-size: 0.875rem !important;
-    line-height: 1.5;
-  }
 }
